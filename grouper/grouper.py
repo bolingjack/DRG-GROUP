@@ -1,22 +1,25 @@
 # -*- coding:utf8 -*-
 
 """工具类"""
-from common.grouper_rule_information import grouper_rule_file_path, drg_information_sheet_name, mdc_diagnosis_sheet_name, adrg_diagnosis_sheet_name, adrg_operation_sheet_name, mcc_sheet_name, cc_sheet_name, excluded_diagnosis_sheet_name, drg_group_rule_sheet_name
+from common.grouper_rule_information import grouper_rule_file_path, mdc_information_sheet_name, adrg_information_sheet_name, \
+    drg_information_sheet_name, mdc_diagnosis_sheet_name, adrg_diagnosis_sheet_name, adrg_operation_sheet_name, mcc_sheet_name, \
+    cc_sheet_name, excluded_diagnosis_sheet_name, drg_group_rule_sheet_name
 import pandas as pd
 from collections import defaultdict
 
 """数据读取"""
-drg_information_data = pd.read_excel(grouper_rule_file_path, sheetname=drg_information_sheet_name, dtype=str)
-mdc_diagnosis_data = pd.read_excel(grouper_rule_file_path, sheetname=mdc_diagnosis_sheet_name, dtype=str)
-adrg_diagnosis_data = pd.read_excel(grouper_rule_file_path, sheetname=adrg_diagnosis_sheet_name, dtype=str)
-adrg_operation_data = pd.read_excel(grouper_rule_file_path, sheetname=adrg_operation_sheet_name, dtype=str)
-mcc_data = pd.read_excel(grouper_rule_file_path, sheetname=mcc_sheet_name, dtype=str)
-cc_data = pd.read_excel(grouper_rule_file_path, sheetname=cc_sheet_name, dtype=str)
-excluded_diagnosis_data = pd.read_excel(grouper_rule_file_path, sheetname=excluded_diagnosis_sheet_name, dtype=str)
-drg_group_rule_data = pd.read_excel(grouper_rule_file_path, sheetname=drg_group_rule_sheet_name, dtype=str)
+drg_information_data = pd.read_excel(grouper_rule_file_path, sheet_name=drg_information_sheet_name, dtype=str)
+mdc_diagnosis_data = pd.read_excel(grouper_rule_file_path, sheet_name=mdc_diagnosis_sheet_name, dtype=str)
+adrg_diagnosis_data = pd.read_excel(grouper_rule_file_path, sheet_name=adrg_diagnosis_sheet_name, dtype=str)
+adrg_operation_data = pd.read_excel(grouper_rule_file_path, sheet_name=adrg_operation_sheet_name, dtype=str)
+mcc_data = pd.read_excel(grouper_rule_file_path, sheet_name=mcc_sheet_name, dtype=str)
+cc_data = pd.read_excel(grouper_rule_file_path, sheet_name=cc_sheet_name, dtype=str)
+excluded_diagnosis_data = pd.read_excel(grouper_rule_file_path, sheet_name=excluded_diagnosis_sheet_name, dtype=str)
+drg_group_rule_data = pd.read_excel(grouper_rule_file_path, sheet_name=drg_group_rule_sheet_name, dtype=str)
 print('分组数据加载完成')
 """数据预处理"""
-for data in [ drg_information_data, mdc_diagnosis_data, adrg_diagnosis_data, adrg_operation_data, mcc_data, cc_data, excluded_diagnosis_data,drg_group_rule_data]:
+for data in [drg_information_data, mdc_diagnosis_data, adrg_diagnosis_data, adrg_operation_data, mcc_data, cc_data, excluded_diagnosis_data,
+             drg_group_rule_data]:
     for col in data.columns:
         if col in ['op', 'mcc', 'cc']:
             data[col] = data[col].apply(int)
@@ -68,14 +71,16 @@ for value in excluded_diagnosis_data_group_by_table_name:
 
 def is_pd1(case, mdc_classification):  # 判断主要诊断是否在MDC诊断表中
     flag = 0
-    if case.primary_diagnosis_code in diagnosis_code_mdc_classification_dict and mdc_classification in diagnosis_code_mdc_classification_dict[case.primary_diagnosis_code]:
+    if case.primary_diagnosis_code in diagnosis_code_mdc_classification_dict and mdc_classification in \
+            diagnosis_code_mdc_classification_dict[case.primary_diagnosis_code]:
         flag = 1
     return flag
 
 
 def is_pd2(case, adrg_classification):  # 判断主要诊断是否在ADRG诊断表中
     flag = 0
-    if case.primary_diagnosis_code in diagnosis_code_adrg_classification_dict and adrg_classification in diagnosis_code_adrg_classification_dict[case.primary_diagnosis_code]:
+    if case.primary_diagnosis_code in diagnosis_code_adrg_classification_dict and adrg_classification in \
+            diagnosis_code_adrg_classification_dict[case.primary_diagnosis_code]:
         flag = 1
     return flag
 
@@ -83,7 +88,8 @@ def is_pd2(case, adrg_classification):  # 判断主要诊断是否在ADRG诊断�
 def is_sd1(case, mdc_classification):  # 判断次要诊断是否在MDC诊断表中
     flag = 0
     for second_diagnosis_code in case.second_diagnosis_code_list:
-        if second_diagnosis_code in diagnosis_code_mdc_classification_dict and mdc_classification in diagnosis_code_mdc_classification_dict[second_diagnosis_code]:
+        if second_diagnosis_code in diagnosis_code_mdc_classification_dict and mdc_classification in diagnosis_code_mdc_classification_dict[
+            second_diagnosis_code]:
             flag = 1
             break
     return flag
@@ -92,7 +98,8 @@ def is_sd1(case, mdc_classification):  # 判断次要诊断是否在MDC诊断表
 def is_sd2(case, adrg_classification):  # 判断次要诊断是否在ADRG诊断表中
     flag = 0
     for second_diagnosis_code in case.second_diagnosis_code_list:
-        if second_diagnosis_code in diagnosis_code_adrg_classification_dict and adrg_classification in diagnosis_code_adrg_classification_dict[second_diagnosis_code]:
+        if second_diagnosis_code in diagnosis_code_adrg_classification_dict and adrg_classification in \
+                diagnosis_code_adrg_classification_dict[second_diagnosis_code]:
             flag = 1
             break
     return flag
@@ -101,7 +108,8 @@ def is_sd2(case, adrg_classification):  # 判断次要诊断是否在ADRG诊断�
 def is_op2(case, adrg_classification):  # 判断手术是否在ADRG手术表中
     flag = 0
     for operation in case.operation_code_list:
-        if operation in operation_code_adrg_classification_dict and adrg_classification in operation_code_adrg_classification_dict[operation]:
+        if operation in operation_code_adrg_classification_dict and adrg_classification in operation_code_adrg_classification_dict[
+            operation]:
             flag = 1
             break
     return flag
@@ -130,7 +138,8 @@ def is_mcc(case):  # 是否有严重并发症与合并症
     flag = 0
     if case.primary_diagnosis_code and case.second_diagnosis_code_list:
         for second_diagnosis_code in case.second_diagnosis_code_list:
-            if second_diagnosis_code in mcc_excluded_table_dict and case.primary_diagnosis_code not in excluded_table_list_dict[mcc_excluded_table_dict[second_diagnosis_code]]:
+            if second_diagnosis_code in mcc_excluded_table_dict and case.primary_diagnosis_code not in excluded_table_list_dict[
+                mcc_excluded_table_dict[second_diagnosis_code]]:
                 flag = 1
     return flag
 
@@ -139,7 +148,8 @@ def is_cc(case):  # 是否有一般并发症与合并症
     flag = 0
     if case.primary_diagnosis_code and case.second_diagnosis_code_list:
         for second_diagnosis_code in case.second_diagnosis_code_list:
-            if second_diagnosis_code in cc_excluded_table_dict and case.primary_diagnosis_code not in excluded_table_list_dict[cc_excluded_table_dict[second_diagnosis_code]]:
+            if second_diagnosis_code in cc_excluded_table_dict and case.primary_diagnosis_code not in excluded_table_list_dict[
+                cc_excluded_table_dict[second_diagnosis_code]]:
                 flag = 1
     return flag
 
@@ -156,17 +166,22 @@ def operation_transform(operation_code):  # 手术转换
     return ''
 
 
-drg_group_rule_data_a1 = drg_group_rule_data[(drg_group_rule_data['mdc_code'] == 'MDCA') & (drg_group_rule_data['adrg_code'] != 'MDC')].reset_index(
+drg_group_rule_data_a1 = drg_group_rule_data[
+    (drg_group_rule_data['mdc_code'] == 'MDCA') & (drg_group_rule_data['adrg_code'] != 'MDC')].reset_index(
     drop=True)  # DRG先期分组1（MDCA下属各ADRG）
-drg_group_rule_data_a2 = drg_group_rule_data[(drg_group_rule_data['mdc_code'] == 'MDCA') & (drg_group_rule_data['adrg_code'] == 'MDC')].reset_index(
+drg_group_rule_data_a2 = drg_group_rule_data[
+    (drg_group_rule_data['mdc_code'] == 'MDCA') & (drg_group_rule_data['adrg_code'] == 'MDC')].reset_index(
     drop=True)  # DRG先期分组2（MDCP、MDCY、MDCZ、MDCM、MDCN、MDCO）
-drg_group_rule_data_pre = drg_group_rule_data[(drg_group_rule_data['mdc_code'] != 'MDCA') & (drg_group_rule_data['mdc_code'].isin(pre_mdc_list))]  # DRG先期分组
-drg_group_rule_data_post = drg_group_rule_data[(drg_group_rule_data['mdc_code'] != 'MDCA') & (drg_group_rule_data['mdc_rule'].notnull())]  # 后期分组
+drg_group_rule_data_pre = drg_group_rule_data[
+    (drg_group_rule_data['mdc_code'] != 'MDCA') & (drg_group_rule_data['mdc_code'].isin(pre_mdc_list))]  # DRG先期分组
+drg_group_rule_data_post = drg_group_rule_data[
+    (drg_group_rule_data['mdc_code'] != 'MDCA') & (drg_group_rule_data['mdc_rule'].notnull())]  # 后期分组
 
 
 def pre_drg_group(case):  # 先期分组
-    drg_group_rule_data_a1_drg = drg_group_rule_data_a1[(drg_group_rule_data_a1['op'] == case.have_operation) & (drg_group_rule_data_a1['mcc'].isin([-1, case.mcc])) & (
-        drg_group_rule_data_a1['cc'].isin([-1, case.cc]))]  # 满足除分组规则之外的其他分组条件
+    drg_group_rule_data_a1_drg = drg_group_rule_data_a1[
+        (drg_group_rule_data_a1['op'] == case.have_operation) & (drg_group_rule_data_a1['mcc'].isin([-1, case.mcc])) & (
+            drg_group_rule_data_a1['cc'].isin([-1, case.cc]))]  # 满足除分组规则之外的其他分组条件
     if len(drg_group_rule_data_a1_drg) != 0:
         drg_group_rule_data_a1_drg.reset_index(drop=True, inplace=True)
         for i in range(len(drg_group_rule_data_a1_drg)):
