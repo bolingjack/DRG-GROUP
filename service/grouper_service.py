@@ -1,21 +1,11 @@
-import os
-import sys
 import flask
 import json
-from gevent import pywsgi
-
-# 添加环境变量
-current_directory = os.path.dirname(os.path.abspath(__file__))
-root_path = os.path.abspath(os.path.dirname(current_directory) + os.path.sep + ".")
-sys.path.append(root_path)
-
 from util.common_util import check_and_transform_field, get_not_into_group_reason
 from util.config_util import get_grouper_host, get_grouper_port
 from grouper.grouper import drg_grouper
 from grouper.model import Case
 
 app = flask.Flask(__name__)  # __name__代表当前的python文件。把当前的python文件当做一个服务启动
-server = pywsgi.WSGIServer((get_grouper_host(), get_grouper_port()), app)
 
 
 @app.route('/grouper', methods=['post'])
@@ -26,6 +16,8 @@ def grouper():
     case = Case()
     case = check_and_transform_field(case, input_dict)
     case = drg_grouper(case)
+    if 'error' in case.drg_code:
+        case.drg_code = '0000'
     if case.drg_code == '0000':
         case = get_not_into_group_reason(case)
         case.mdc_code = '0000'
@@ -43,5 +35,4 @@ if __name__ == '__main__':
     # port可以指定端口，默认端口是5000
     # host默认是服务器，默认是127.0.0.1
     # debug=True 修改时不关闭服务
-    print('服务启动')
-    server.serve_forever()
+    app.run(host=get_grouper_host(), port=get_grouper_port())

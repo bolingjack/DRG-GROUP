@@ -15,8 +15,9 @@ class Case(object):
         self.newborn_age_day = -1  # 新生儿年龄（天）
         self.newborn_birth_weight = -1  # 新生儿出生体重（克）
 
-        self.second_diagnosis_code_list = []  # 次要诊断编码列表
+        self.secondary_diagnosis_code_list = []  # 次要诊断编码列表
         self.minor_operation_code_list = []  # 次要手术编码列表
+        self.operation_code_list = []  # 手术编码列表
         self.have_operation = 0  # 是否有手术
 
         self.mdc_code = "0000"  # MDC编码
