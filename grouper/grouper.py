@@ -80,16 +80,14 @@ for value in excluded_diagnosis_data_group_by_table_name:
 
 def is_pd1(case, mdc_classification):  # 判断主要诊断是否在MDC诊断表中
     flag = 0
-    if case.primary_diagnosis_code in diagnosis_code_mdc_classification_dict and mdc_classification in \
-            diagnosis_code_mdc_classification_dict[case.primary_diagnosis_code]:
+    if case.primary_diagnosis_code in diagnosis_code_mdc_classification_dict and mdc_classification in diagnosis_code_mdc_classification_dict[case.primary_diagnosis_code]:
         flag = 1
     return flag
 
 
 def is_pd2(case, adrg_classification):  # 判断主要诊断是否在ADRG诊断表中
     flag = 0
-    if case.primary_diagnosis_code in diagnosis_code_adrg_classification_dict and adrg_classification in \
-            diagnosis_code_adrg_classification_dict[case.primary_diagnosis_code]:
+    if case.primary_diagnosis_code in diagnosis_code_adrg_classification_dict and adrg_classification in diagnosis_code_adrg_classification_dict[case.primary_diagnosis_code]:
         flag = 1
     return flag
 
@@ -97,8 +95,7 @@ def is_pd2(case, adrg_classification):  # 判断主要诊断是否在ADRG诊断�
 def is_sd1(case, mdc_classification):  # 判断次要诊断是否在MDC诊断表中
     flag = 0
     for secondary_diagnosis_code in case.secondary_diagnosis_code_list:
-        if secondary_diagnosis_code in diagnosis_code_mdc_classification_dict and mdc_classification in \
-                diagnosis_code_mdc_classification_dict[secondary_diagnosis_code]:
+        if secondary_diagnosis_code in diagnosis_code_mdc_classification_dict and mdc_classification in diagnosis_code_mdc_classification_dict[secondary_diagnosis_code]:
             flag = 1
             break
     return flag
@@ -107,8 +104,7 @@ def is_sd1(case, mdc_classification):  # 判断次要诊断是否在MDC诊断表
 def is_sd2(case, adrg_classification):  # 判断次要诊断是否在ADRG诊断表中
     flag = 0
     for secondary_diagnosis_code in case.secondary_diagnosis_code_list:
-        if secondary_diagnosis_code in diagnosis_code_adrg_classification_dict and adrg_classification in \
-                diagnosis_code_adrg_classification_dict[secondary_diagnosis_code]:
+        if secondary_diagnosis_code in diagnosis_code_adrg_classification_dict and adrg_classification in diagnosis_code_adrg_classification_dict[secondary_diagnosis_code]:
             flag = 1
             break
     return flag
@@ -117,8 +113,7 @@ def is_sd2(case, adrg_classification):  # 判断次要诊断是否在ADRG诊断�
 def is_op2(case, adrg_classification):  # 判断手术是否在ADRG手术表中
     flag = 0
     for operation_code in case.operation_code_list:
-        if operation_code in operation_code_adrg_classification_dict and adrg_classification in operation_code_adrg_classification_dict[
-            operation_code]:
+        if operation_code in operation_code_adrg_classification_dict and adrg_classification in operation_code_adrg_classification_dict[operation_code]:
             flag = 1
             break
     return flag
@@ -126,8 +121,7 @@ def is_op2(case, adrg_classification):  # 判断手术是否在ADRG手术表中
 
 def is_mo2(case, adrg_classification):  # 判断手术是否在ADRG手术表中
     flag = 0
-    if case.major_operation_code in operation_code_adrg_classification_dict and adrg_classification in \
-            operation_code_adrg_classification_dict[case.major_operation_code]:
+    if case.major_operation_code in operation_code_adrg_classification_dict and adrg_classification in operation_code_adrg_classification_dict[case.major_operation_code]:
         flag = 1
     return flag
 
@@ -135,8 +129,7 @@ def is_mo2(case, adrg_classification):  # 判断手术是否在ADRG手术表中
 def is_so2(case, adrg_classification):  # 判断手术是否在ADRG手术表中
     flag = 0
     for operation_code in case.minor_operation_code_list:
-        if operation_code in operation_code_adrg_classification_dict and adrg_classification in operation_code_adrg_classification_dict[
-            operation_code]:
+        if operation_code in operation_code_adrg_classification_dict and adrg_classification in operation_code_adrg_classification_dict[operation_code]:
             flag = 1
             break
     return flag
@@ -165,7 +158,7 @@ def is_mcc(case):  # 是否有严重并发症与合并症
     flag = 0
     if case.primary_diagnosis_code and case.secondary_diagnosis_code_list:
         for secondary_diagnosis_code in case.secondary_diagnosis_code_list:
-            if secondary_diagnosis_code in mcc_excluded_table_dict :
+            if secondary_diagnosis_code in mcc_excluded_table_dict:
                 if case.primary_diagnosis_code not in excluded_table_list_dict[mcc_excluded_table_dict[secondary_diagnosis_code]]:
                     flag = 1
     return flag
@@ -181,15 +174,11 @@ def is_cc(case):  # 是否有一般并发症与合并症
     return flag
 
 
-drg_group_rule_data_a1 = drg_group_rule_data[
-    (drg_group_rule_data['mdc_code'] == 'MDCA') & (drg_group_rule_data['adrg_code'] != 'MDC')]  # MDCA下先期分组1
-drg_group_rule_data_a2 = drg_group_rule_data[
-    (drg_group_rule_data['mdc_code'] == 'MDCA') & (drg_group_rule_data['adrg_code'] == 'MDC')].reset_index(
+drg_group_rule_data_a1 = drg_group_rule_data[(drg_group_rule_data['mdc_code'] == 'MDCA') & (drg_group_rule_data['adrg_code'] != 'MDC')]  # MDCA下先期分组1
+drg_group_rule_data_a2 = drg_group_rule_data[(drg_group_rule_data['mdc_code'] == 'MDCA') & (drg_group_rule_data['adrg_code'] == 'MDC')].reset_index(
     drop=True)  # MDCA下先期分组2（MDCP、MDCY、MDCZ、MDCM、MDCN、MDCO）
-drg_group_rule_data_pre = drg_group_rule_data[
-    (drg_group_rule_data['mdc_code'] != 'MDCA') & (drg_group_rule_data['mdc_code'].isin(pre_mdc_list))]  # 除MDCA外先期分组
-drg_group_rule_data_post = drg_group_rule_data[
-    (drg_group_rule_data['mdc_code'] != 'MDCA') & (~drg_group_rule_data['mdc_code'].isin(pre_mdc_list))]  # 后期分组
+drg_group_rule_data_pre = drg_group_rule_data[(drg_group_rule_data['mdc_code'] != 'MDCA') & (drg_group_rule_data['mdc_code'].isin(pre_mdc_list))]  # 除MDCA外先期分组
+drg_group_rule_data_post = drg_group_rule_data[(drg_group_rule_data['mdc_code'] != 'MDCA') & (~drg_group_rule_data['mdc_code'].isin(pre_mdc_list))]  # 后期分组
 
 
 def pre_drg_group(case):  # 先期分组
