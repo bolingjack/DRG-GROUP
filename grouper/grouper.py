@@ -2,8 +2,8 @@
 
 """工具类"""
 from common.grouper_rule_information import grouper_rule_file_path, mdc_information_sheet_name, adrg_information_sheet_name, \
-    drg_information_sheet_name, mdc_diagnosis_sheet_name, adrg_diagnosis_sheet_name, adrg_operation_sheet_name, mcc_sheet_name, \
-    cc_sheet_name, excluded_diagnosis_sheet_name, drg_group_rule_sheet_name
+    drg_information_sheet_name, mdc_diagnosis_sheet_name, adrg_diagnosis_sheet_name, adrg_operation_sheet_name, adrg_operation_add_sheet_name, standard_operation_sheet_name, \
+    mcc_sheet_name, cc_sheet_name, excluded_diagnosis_sheet_name, drg_group_rule_sheet_name
 import pandas as pd
 from collections import defaultdict
 
@@ -14,6 +14,8 @@ drg_information_data = pd.read_excel(grouper_rule_file_path, sheet_name=drg_info
 mdc_diagnosis_data = pd.read_excel(grouper_rule_file_path, sheet_name=mdc_diagnosis_sheet_name, dtype=str)
 adrg_diagnosis_data = pd.read_excel(grouper_rule_file_path, sheet_name=adrg_diagnosis_sheet_name, dtype=str)
 adrg_operation_data = pd.read_excel(grouper_rule_file_path, sheet_name=adrg_operation_sheet_name, dtype=str)
+adrg_operation_add_data = pd.read_excel(grouper_rule_file_path, sheet_name=adrg_operation_add_sheet_name, dtype=str)
+standard_operation_data = pd.read_excel(grouper_rule_file_path, sheet_name=standard_operation_sheet_name, dtype=str)
 mcc_data = pd.read_excel(grouper_rule_file_path, sheet_name=mcc_sheet_name, dtype=str)
 cc_data = pd.read_excel(grouper_rule_file_path, sheet_name=cc_sheet_name, dtype=str)
 excluded_diagnosis_data = pd.read_excel(grouper_rule_file_path, sheet_name=excluded_diagnosis_sheet_name, dtype=str)
@@ -21,7 +23,7 @@ drg_group_rule_data = pd.read_excel(grouper_rule_file_path, sheet_name=drg_group
 print('分组数据加载完成')
 """数据预处理"""
 for data in [mdc_information_data, adrg_information_data, drg_information_data, mdc_diagnosis_data, adrg_diagnosis_data,
-             adrg_operation_data, mcc_data, cc_data, excluded_diagnosis_data, drg_group_rule_data]:
+             adrg_operation_data, adrg_operation_add_data, standard_operation_data, mcc_data, cc_data, excluded_diagnosis_data, drg_group_rule_data]:
     for col in data.columns:
         if col in ['op', 'mcc', 'cc']:
             data[col] = data[col].apply(int)
@@ -33,6 +35,7 @@ adrg_code_name_dict = adrg_information_data.set_index('adrg_code').to_dict()['ad
 drg_code_mdc_code_dict = drg_information_data.set_index('drg_code').to_dict()['mdc_code']
 drg_code_adrg_code_dict = drg_information_data.set_index('drg_code').to_dict()['adrg_code']
 drg_code_name_dict = drg_information_data.set_index('drg_code').to_dict()['drg_name']
+standard_operation_list = list(standard_operation_data['operation_code'])
 
 
 def get_information(case):
@@ -63,6 +66,7 @@ for value in adrg_diagnosis_data_group_by_diagnosis_code:
     _diagnosis_code, sub_data = value
     diagnosis_code_adrg_classification_dict[_diagnosis_code] = set(sub_data['classification'])
 
+adrg_operation_data = adrg_operation_data.append(adrg_operation_add_data)
 operation_code_adrg_classification_dict = defaultdict(set)  # 手术编码-adrg分类字典
 adrg_operation_data_group_by_operation_code = adrg_operation_data.groupby(['operation_code'])
 for value in adrg_operation_data_group_by_operation_code:
@@ -244,13 +248,13 @@ def drg_grouper(case):
             case.secondary_diagnosis_code_list.append(tmp_diagnosis_code)
 
         # 处理主要手术及操作编码
-        if case.major_operation_code and case.major_operation_code in operation_code_adrg_classification_dict:
+        if case.major_operation_code and case.major_operation_code in standard_operation_list:
             case.operation_code_list.append(case.major_operation_code)
 
         # 处理其他手术及操作编码
         for key in case.minor_operation_code_dict:
             tmp_operation_code = case.minor_operation_code_dict[key]
-            if tmp_operation_code and tmp_operation_code in operation_code_adrg_classification_dict:
+            if tmp_operation_code and tmp_operation_code in standard_operation_list:
                 case.operation_code_list.append(tmp_operation_code)
                 case.minor_operation_code_list.append(tmp_operation_code)
 
