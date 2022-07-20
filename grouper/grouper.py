@@ -246,6 +246,8 @@ def drg_grouper(case):
         # 处理主要手术及操作编码
         if case.major_operation_code and case.major_operation_code in operation_code_adrg_classification_dict:
             case.operation_code_list.append(case.major_operation_code)
+        else:
+            case.major_operation_code = ""
 
         # 处理其他手术及操作编码
         for key in case.minor_operation_code_dict:
@@ -254,7 +256,7 @@ def drg_grouper(case):
                 case.operation_code_list.append(tmp_operation_code)
                 case.minor_operation_code_list.append(tmp_operation_code)
 
-        if case.operation_code_list:
+        if case.major_operation_code:
             case.have_operation = 1
         # 处理伴随症及合并症
         case.has_mcc = is_mcc(case)
